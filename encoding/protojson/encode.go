@@ -5,8 +5,8 @@
 package protojson
 
 import (
-	"encoding/base64"
 	"fmt"
+	"sync"
 
 	"google.golang.org/protobuf/internal/encoding/json"
 	"google.golang.org/protobuf/internal/encoding/messageset"
@@ -88,6 +88,8 @@ type MarshalOptions struct {
 		protoregistry.ExtensionTypeResolver
 		protoregistry.MessageTypeResolver
 	}
+
+	Unordered bool
 }
 
 // Format formats the message as a string.
@@ -110,6 +112,30 @@ func (o MarshalOptions) Marshal(m proto.Message) ([]byte, error) {
 	return o.marshal(m)
 }
 
+var encoderPool sync.Pool
+
+func getCachedEncoder() *json.Encoder {
+	v := encoderPool.Get()
+	if v == nil {
+		return nil
+	}
+	e := v.(*json.Encoder)
+	e.Reset()
+	return e
+}
+
+func newEncoder(indent string) (*json.Encoder, error) {
+	e := getCachedEncoder()
+	if e == nil {
+		e = json.NewEncoder()
+	}
+	err := e.SetIndent(indent)
+	if err != nil {
+		return nil, err
+	}
+	return e, nil
+}
+
 // marshal is a centralized function that all marshal operations go through.
 // For profiling purposes, avoid changing the name of this function or
 // introducing other code paths for marshal that do not go through this.
@@ -121,7 +147,7 @@ func (o MarshalOptions) marshal(m proto.Message) ([]byte, error) {
 		o.Resolver = protoregistry.GlobalTypes
 	}
 
-	internalEnc, err := json.NewEncoder(o.Indent)
+	internalEnc, err := newEncoder(o.Indent)
 	if err != nil {
 		return nil, err
 	}
@@ -139,6 +165,7 @@ func (o MarshalOptions) marshal(m proto.Message) ([]byte, error) {
 	if o.AllowPartial {
 		return enc.Bytes(), nil
 	}
+	encoderPool.Put(internalEnc)
 	return enc.Bytes(), proto.CheckInitialized(m)
 }
 
@@ -196,6 +223,13 @@ func (m unpopulatedFieldRanger) Range(f func(pref.FieldDescriptor, pref.Value) b
 	m.Message.Range(f)
 }
 
+func (e encoder) order() order.FieldOrder {
+	if e.opts.Unordered {
+		return nil
+	}
+	return order.IndexNameFieldOrder
+}
+
 // marshalMessage marshals the fields in the given protoreflect.Message.
 // If the typeURL is non-empty, then a synthetic "@type" field is injected
 // containing the URL as the value.
@@ -207,7 +241,6 @@ func (e encoder) marshalMessage(m pref.Message, typeURL string) error {
 	if marshal := wellKnownTypeMarshaler(m.Descriptor().FullName()); marshal != nil {
 		return marshal(e, m)
 	}
-
 	e.StartObject()
 	defer e.EndObject()
 
@@ -220,7 +253,7 @@ func (e encoder) marshalMessage(m pref.Message, typeURL string) error {
 	}
 
 	var err error
-	order.RangeFields(fields, order.IndexNameFieldOrder, func(fd pref.FieldDescriptor, v pref.Value) bool {
+	order.RangeFields(fields, e.order(), func(fd pref.FieldDescriptor, v pref.Value) bool {
 		name := fd.JSONName()
 		if e.opts.UseProtoNames {
 			name = fd.TextName()
@@ -272,22 +305,22 @@ func (e encoder) marshalSingular(val pref.Value, fd pref.FieldDescriptor) error 
 	case pref.Uint32Kind, pref.Fixed32Kind:
 		e.WriteUint(val.Uint())
 
-	case pref.Int64Kind, pref.Sint64Kind, pref.Uint64Kind,
-		pref.Sfixed64Kind, pref.Fixed64Kind:
-		// 64-bit integers are written out as JSON string.
-		e.WriteString(val.String())
+	case pref.Int64Kind, pref.Sint64Kind, pref.Sfixed64Kind:
+		e.WriteInt64(val.Int())
+
+	case pref.Uint64Kind, pref.Fixed64Kind:
+		e.WriteUint64(val.Uint())
 
 	case pref.FloatKind:
-		// Encoder.WriteFloat handles the special numbers NaN and infinites.
+		// Encoder.WriteFloat handles the special numbers NaN and infinities.
 		e.WriteFloat(val.Float(), 32)
 
 	case pref.DoubleKind:
-		// Encoder.WriteFloat handles the special numbers NaN and infinites.
+		// Encoder.WriteFloat handles the special numbers NaN and infinities.
 		e.WriteFloat(val.Float(), 64)
 
 	case pref.BytesKind:
-		e.WriteString(base64.StdEncoding.EncodeToString(val.Bytes()))
-
+		e.WriteByteSlice(val.Bytes())
 	case pref.EnumKind:
 		if fd.Enum().FullName() == genid.NullValue_enum_fullname {
 			e.WriteNull()
