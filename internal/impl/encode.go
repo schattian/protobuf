@@ -180,6 +180,7 @@ func (mi *MessageInfo) appendExtensions(b []byte, ext *map[int32]ExtensionField,
 		}
 		return b, err
 	default:
+		var err error
 		if opts.Deterministic() {
 			keys := make([]int, 0, len(*ext))
 			for k := range *ext {
@@ -189,16 +190,16 @@ func (mi *MessageInfo) appendExtensions(b []byte, ext *map[int32]ExtensionField,
 			for _, k := range keys {
 				x := (*ext)[int32(k)]
 				xi := getExtensionFieldInfo(x.Type())
-				b, err := xi.funcs.marshal(b, x.Value(), xi.wiretag, opts)
+				b, err = xi.funcs.marshal(b, x.Value(), xi.wiretag, opts)
 				if err != nil {
 					return b, err
 				}
 			}
 		} else {
-			for k, _ := range *ext {
+			for k := range *ext {
 				x := (*ext)[int32(k)]
 				xi := getExtensionFieldInfo(x.Type())
-				b, err := xi.funcs.marshal(b, x.Value(), xi.wiretag, opts)
+				b, err = xi.funcs.marshal(b, x.Value(), xi.wiretag, opts)
 				if err != nil {
 					return b, err
 				}
