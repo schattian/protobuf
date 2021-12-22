@@ -9,9 +9,9 @@ import (
 	"reflect"
 	"testing"
 
-	"google.golang.org/protobuf/internal/encoding/defval"
-	fdesc "google.golang.org/protobuf/internal/filedesc"
-	pref "google.golang.org/protobuf/reflect/protoreflect"
+	"github.com/schattian/protobuf/internal/encoding/defval"
+	fdesc "github.com/schattian/protobuf/internal/filedesc"
+	pref "github.com/schattian/protobuf/reflect/protoreflect"
 )
 
 func Test(t *testing.T) {

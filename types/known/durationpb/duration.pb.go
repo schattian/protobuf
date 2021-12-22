@@ -77,12 +77,13 @@
 package durationpb
 
 import (
-	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
-	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	math "math"
 	reflect "reflect"
 	sync "sync"
 	time "time"
+
+	protoreflect "github.com/schattian/protobuf/reflect/protoreflect"
+	protoimpl "github.com/schattian/protobuf/runtime/protoimpl"
 )
 
 // A Duration represents a signed, fixed-length span of time represented

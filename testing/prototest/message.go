@@ -14,12 +14,12 @@ import (
 	"strings"
 	"testing"
 
-	"google.golang.org/protobuf/encoding/prototext"
-	"google.golang.org/protobuf/encoding/protowire"
-	"google.golang.org/protobuf/proto"
-	"google.golang.org/protobuf/reflect/protoreflect"
-	pref "google.golang.org/protobuf/reflect/protoreflect"
-	"google.golang.org/protobuf/reflect/protoregistry"
+	"github.com/schattian/protobuf/encoding/prototext"
+	"github.com/schattian/protobuf/encoding/protowire"
+	"github.com/schattian/protobuf/proto"
+	"github.com/schattian/protobuf/reflect/protoreflect"
+	pref "github.com/schattian/protobuf/reflect/protoreflect"
+	"github.com/schattian/protobuf/reflect/protoregistry"
 )
 
 // TODO: Test invalid field descriptors or oneof descriptors.

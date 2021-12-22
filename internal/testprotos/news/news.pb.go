@@ -8,12 +8,13 @@
 package news
 
 import (
-	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
-	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
-	anypb "google.golang.org/protobuf/types/known/anypb"
-	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 	reflect "reflect"
 	sync "sync"
+
+	protoreflect "github.com/schattian/protobuf/reflect/protoreflect"
+	protoimpl "github.com/schattian/protobuf/runtime/protoimpl"
+	anypb "github.com/schattian/protobuf/types/known/anypb"
+	timestamppb "github.com/schattian/protobuf/types/known/timestamppb"
 )
 
 type Article_Status int32

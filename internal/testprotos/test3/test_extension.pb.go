@@ -8,10 +8,11 @@
 package test3
 
 import (
-	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
-	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
-	descriptorpb "google.golang.org/protobuf/types/descriptorpb"
 	reflect "reflect"
+
+	protoreflect "github.com/schattian/protobuf/reflect/protoreflect"
+	protoimpl "github.com/schattian/protobuf/runtime/protoimpl"
+	descriptorpb "github.com/schattian/protobuf/types/descriptorpb"
 )
 
 var file_internal_testprotos_test3_test_extension_proto_extTypes = []protoimpl.ExtensionInfo{

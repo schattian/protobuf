@@ -8,11 +8,12 @@
 package import_public
 
 import (
-	sub "google.golang.org/protobuf/cmd/protoc-gen-go/testdata/import_public/sub"
-	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
-	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
 	sync "sync"
+
+	sub "github.com/schattian/protobuf/cmd/protoc-gen-go/testdata/import_public/sub"
+	protoreflect "github.com/schattian/protobuf/reflect/protoreflect"
+	protoimpl "github.com/schattian/protobuf/runtime/protoimpl"
 )
 
 // Symbols defined in public import of cmd/protoc-gen-go/testdata/import_public/sub/a.proto.

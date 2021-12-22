@@ -41,7 +41,7 @@
 // The Value, Struct, and ListValue types have generated MarshalJSON and
 // UnmarshalJSON methods such that they serialize JSON equivalent to what the
 // messages themselves represent. Use of these types with the
-// "google.golang.org/protobuf/encoding/protojson" package
+// "github.com/schattian/protobuf/encoding/protojson" package
 // ensures that they will be serialized as their JSON equivalent.
 //
 //
@@ -123,13 +123,14 @@ package structpb
 
 import (
 	base64 "encoding/base64"
-	protojson "google.golang.org/protobuf/encoding/protojson"
-	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
-	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	math "math"
 	reflect "reflect"
 	sync "sync"
 	utf8 "unicode/utf8"
+
+	protojson "github.com/schattian/protobuf/encoding/protojson"
+	protoreflect "github.com/schattian/protobuf/reflect/protoreflect"
+	protoimpl "github.com/schattian/protobuf/runtime/protoimpl"
 )
 
 // `NullValue` is a singleton enumeration to represent the null value for the

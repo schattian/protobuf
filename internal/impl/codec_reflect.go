@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+//go:build purego || appengine
 // +build purego appengine
 
 package impl
@@ -9,7 +10,7 @@ package impl
 import (
 	"reflect"
 
-	"google.golang.org/protobuf/encoding/protowire"
+	"github.com/schattian/protobuf/encoding/protowire"
 )
 
 func sizeEnum(p pointer, f *coderFieldInfo, _ marshalOptions) (size int) {

@@ -8,9 +8,10 @@
 package test
 
 import (
-	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
-	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
+
+	protoreflect "github.com/schattian/protobuf/reflect/protoreflect"
+	protoimpl "github.com/schattian/protobuf/runtime/protoimpl"
 )
 
 var file_internal_testprotos_test_ext_proto_extTypes = []protoimpl.ExtensionInfo{

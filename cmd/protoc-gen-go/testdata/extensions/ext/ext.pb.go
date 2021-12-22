@@ -8,12 +8,13 @@
 package ext
 
 import (
-	base "google.golang.org/protobuf/cmd/protoc-gen-go/testdata/extensions/base"
-	extra "google.golang.org/protobuf/cmd/protoc-gen-go/testdata/extensions/extra"
-	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
-	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
 	sync "sync"
+
+	base "github.com/schattian/protobuf/cmd/protoc-gen-go/testdata/extensions/base"
+	extra "github.com/schattian/protobuf/cmd/protoc-gen-go/testdata/extensions/extra"
+	protoreflect "github.com/schattian/protobuf/reflect/protoreflect"
+	protoimpl "github.com/schattian/protobuf/runtime/protoimpl"
 )
 
 type Enum int32

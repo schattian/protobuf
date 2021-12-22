@@ -9,12 +9,12 @@ import (
 	"strings"
 	"testing"
 
-	"google.golang.org/protobuf/encoding/prototext"
-	"google.golang.org/protobuf/internal/flags"
-	"google.golang.org/protobuf/proto"
+	"github.com/schattian/protobuf/encoding/prototext"
+	"github.com/schattian/protobuf/internal/flags"
+	"github.com/schattian/protobuf/proto"
 
-	testpb "google.golang.org/protobuf/internal/testprotos/test"
-	weakpb "google.golang.org/protobuf/internal/testprotos/test/weak1"
+	testpb "github.com/schattian/protobuf/internal/testprotos/test"
+	weakpb "github.com/schattian/protobuf/internal/testprotos/test/weak1"
 )
 
 func TestCheckInitializedErrors(t *testing.T) {

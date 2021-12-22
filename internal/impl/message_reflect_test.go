@@ -16,17 +16,17 @@ import (
 	cmp "github.com/google/go-cmp/cmp"
 	cmpopts "github.com/google/go-cmp/cmp/cmpopts"
 
-	"google.golang.org/protobuf/encoding/prototext"
-	pimpl "google.golang.org/protobuf/internal/impl"
-	"google.golang.org/protobuf/proto"
-	pdesc "google.golang.org/protobuf/reflect/protodesc"
-	pref "google.golang.org/protobuf/reflect/protoreflect"
-	"google.golang.org/protobuf/reflect/protoregistry"
-	"google.golang.org/protobuf/testing/protopack"
+	"github.com/schattian/protobuf/encoding/prototext"
+	pimpl "github.com/schattian/protobuf/internal/impl"
+	"github.com/schattian/protobuf/proto"
+	pdesc "github.com/schattian/protobuf/reflect/protodesc"
+	pref "github.com/schattian/protobuf/reflect/protoreflect"
+	"github.com/schattian/protobuf/reflect/protoregistry"
+	"github.com/schattian/protobuf/testing/protopack"
 
-	proto2_20180125 "google.golang.org/protobuf/internal/testprotos/legacy/proto2_20180125_92554152"
-	testpb "google.golang.org/protobuf/internal/testprotos/test"
-	"google.golang.org/protobuf/types/descriptorpb"
+	proto2_20180125 "github.com/schattian/protobuf/internal/testprotos/legacy/proto2_20180125_92554152"
+	testpb "github.com/schattian/protobuf/internal/testprotos/test"
+	"github.com/schattian/protobuf/types/descriptorpb"
 )
 
 // List of test operations to perform on messages, lists, or maps.

@@ -13,17 +13,17 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
 
-	"google.golang.org/protobuf/encoding/prototext"
-	pimpl "google.golang.org/protobuf/internal/impl"
-	"google.golang.org/protobuf/internal/pragma"
-	"google.golang.org/protobuf/proto"
-	pdesc "google.golang.org/protobuf/reflect/protodesc"
-	pref "google.golang.org/protobuf/reflect/protoreflect"
-	preg "google.golang.org/protobuf/reflect/protoregistry"
-	piface "google.golang.org/protobuf/runtime/protoiface"
+	"github.com/schattian/protobuf/encoding/prototext"
+	pimpl "github.com/schattian/protobuf/internal/impl"
+	"github.com/schattian/protobuf/internal/pragma"
+	"github.com/schattian/protobuf/proto"
+	pdesc "github.com/schattian/protobuf/reflect/protodesc"
+	pref "github.com/schattian/protobuf/reflect/protoreflect"
+	preg "github.com/schattian/protobuf/reflect/protoregistry"
+	piface "github.com/schattian/protobuf/runtime/protoiface"
 
-	proto2_20180125 "google.golang.org/protobuf/internal/testprotos/legacy/proto2_20180125_92554152"
-	"google.golang.org/protobuf/types/descriptorpb"
+	proto2_20180125 "github.com/schattian/protobuf/internal/testprotos/legacy/proto2_20180125_92554152"
+	"github.com/schattian/protobuf/types/descriptorpb"
 )
 
 type LegacyTestMessage struct {

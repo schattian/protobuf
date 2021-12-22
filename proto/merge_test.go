@@ -12,17 +12,17 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 
-	"google.golang.org/protobuf/encoding/prototext"
-	"google.golang.org/protobuf/internal/protobuild"
-	"google.golang.org/protobuf/proto"
-	"google.golang.org/protobuf/reflect/protoreflect"
-	"google.golang.org/protobuf/testing/protocmp"
-	"google.golang.org/protobuf/testing/protopack"
-	"google.golang.org/protobuf/types/dynamicpb"
+	"github.com/schattian/protobuf/encoding/prototext"
+	"github.com/schattian/protobuf/internal/protobuild"
+	"github.com/schattian/protobuf/proto"
+	"github.com/schattian/protobuf/reflect/protoreflect"
+	"github.com/schattian/protobuf/testing/protocmp"
+	"github.com/schattian/protobuf/testing/protopack"
+	"github.com/schattian/protobuf/types/dynamicpb"
 
-	legacypb "google.golang.org/protobuf/internal/testprotos/legacy"
-	testpb "google.golang.org/protobuf/internal/testprotos/test"
-	test3pb "google.golang.org/protobuf/internal/testprotos/test3"
+	legacypb "github.com/schattian/protobuf/internal/testprotos/legacy"
+	testpb "github.com/schattian/protobuf/internal/testprotos/test"
+	test3pb "github.com/schattian/protobuf/internal/testprotos/test3"
 )
 
 type testMerge struct {

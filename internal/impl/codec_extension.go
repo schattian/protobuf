@@ -8,9 +8,9 @@ import (
 	"sync"
 	"sync/atomic"
 
-	"google.golang.org/protobuf/encoding/protowire"
-	"google.golang.org/protobuf/internal/errors"
-	pref "google.golang.org/protobuf/reflect/protoreflect"
+	"github.com/schattian/protobuf/encoding/protowire"
+	"github.com/schattian/protobuf/internal/errors"
+	pref "github.com/schattian/protobuf/reflect/protoreflect"
 )
 
 type extensionFieldInfo struct {

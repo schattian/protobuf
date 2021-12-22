@@ -3,6 +3,7 @@
 // license that can be found in the LICENSE file.
 
 // The protoreflect tag disables fast-path methods, including legacy ones.
+//go:build !protoreflect
 // +build !protoreflect
 
 package proto_test
@@ -13,11 +14,11 @@ import (
 	"fmt"
 	"testing"
 
-	"google.golang.org/protobuf/internal/impl"
-	"google.golang.org/protobuf/proto"
-	"google.golang.org/protobuf/runtime/protoiface"
+	"github.com/schattian/protobuf/internal/impl"
+	"github.com/schattian/protobuf/proto"
+	"github.com/schattian/protobuf/runtime/protoiface"
 
-	legacypb "google.golang.org/protobuf/internal/testprotos/legacy"
+	legacypb "github.com/schattian/protobuf/internal/testprotos/legacy"
 )
 
 type selfMarshaler struct {

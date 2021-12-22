@@ -8,11 +8,12 @@
 package msetextpb
 
 import (
-	messagesetpb "google.golang.org/protobuf/internal/testprotos/messageset/messagesetpb"
-	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
-	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
 	sync "sync"
+
+	messagesetpb "github.com/schattian/protobuf/internal/testprotos/messageset/messagesetpb"
+	protoreflect "github.com/schattian/protobuf/reflect/protoreflect"
+	protoimpl "github.com/schattian/protobuf/runtime/protoimpl"
 )
 
 type Ext1 struct {

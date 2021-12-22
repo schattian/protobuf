@@ -5,7 +5,7 @@
 package proto
 
 import (
-	"google.golang.org/protobuf/reflect/protoreflect"
+	"github.com/schattian/protobuf/reflect/protoreflect"
 )
 
 // HasExtension reports whether an extension field is populated.

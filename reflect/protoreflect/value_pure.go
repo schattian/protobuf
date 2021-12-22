@@ -2,11 +2,12 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+//go:build purego || appengine
 // +build purego appengine
 
 package protoreflect
 
-import "google.golang.org/protobuf/internal/pragma"
+import "github.com/schattian/protobuf/internal/pragma"
 
 type valueType int
 

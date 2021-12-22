@@ -11,19 +11,19 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 
-	"google.golang.org/protobuf/internal/detrand"
-	"google.golang.org/protobuf/internal/msgfmt"
-	"google.golang.org/protobuf/proto"
-	"google.golang.org/protobuf/testing/protocmp"
-	"google.golang.org/protobuf/testing/protopack"
+	"github.com/schattian/protobuf/internal/detrand"
+	"github.com/schattian/protobuf/internal/msgfmt"
+	"github.com/schattian/protobuf/proto"
+	"github.com/schattian/protobuf/testing/protocmp"
+	"github.com/schattian/protobuf/testing/protopack"
 
-	testpb "google.golang.org/protobuf/internal/testprotos/test"
-	textpb "google.golang.org/protobuf/internal/testprotos/textpb2"
-	dynpb "google.golang.org/protobuf/types/dynamicpb"
-	anypb "google.golang.org/protobuf/types/known/anypb"
-	durpb "google.golang.org/protobuf/types/known/durationpb"
-	tspb "google.golang.org/protobuf/types/known/timestamppb"
-	wpb "google.golang.org/protobuf/types/known/wrapperspb"
+	testpb "github.com/schattian/protobuf/internal/testprotos/test"
+	textpb "github.com/schattian/protobuf/internal/testprotos/textpb2"
+	dynpb "github.com/schattian/protobuf/types/dynamicpb"
+	anypb "github.com/schattian/protobuf/types/known/anypb"
+	durpb "github.com/schattian/protobuf/types/known/durationpb"
+	tspb "github.com/schattian/protobuf/types/known/timestamppb"
+	wpb "github.com/schattian/protobuf/types/known/wrapperspb"
 )
 
 func init() {

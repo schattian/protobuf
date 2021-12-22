@@ -17,14 +17,14 @@ import (
 	"strconv"
 	"strings"
 
-	"google.golang.org/protobuf/encoding/protowire"
-	"google.golang.org/protobuf/internal/errors"
-	"google.golang.org/protobuf/proto"
-	"google.golang.org/protobuf/reflect/protodesc"
-	"google.golang.org/protobuf/reflect/protoreflect"
-	"google.golang.org/protobuf/testing/protopack"
+	"github.com/schattian/protobuf/encoding/protowire"
+	"github.com/schattian/protobuf/internal/errors"
+	"github.com/schattian/protobuf/proto"
+	"github.com/schattian/protobuf/reflect/protodesc"
+	"github.com/schattian/protobuf/reflect/protoreflect"
+	"github.com/schattian/protobuf/testing/protopack"
 
-	"google.golang.org/protobuf/types/descriptorpb"
+	"github.com/schattian/protobuf/types/descriptorpb"
 )
 
 func main() {

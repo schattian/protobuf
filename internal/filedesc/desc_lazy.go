@@ -8,12 +8,12 @@ import (
 	"reflect"
 	"sync"
 
-	"google.golang.org/protobuf/encoding/protowire"
-	"google.golang.org/protobuf/internal/descopts"
-	"google.golang.org/protobuf/internal/genid"
-	"google.golang.org/protobuf/internal/strs"
-	"google.golang.org/protobuf/proto"
-	pref "google.golang.org/protobuf/reflect/protoreflect"
+	"github.com/schattian/protobuf/encoding/protowire"
+	"github.com/schattian/protobuf/internal/descopts"
+	"github.com/schattian/protobuf/internal/genid"
+	"github.com/schattian/protobuf/internal/strs"
+	"github.com/schattian/protobuf/proto"
+	pref "github.com/schattian/protobuf/reflect/protoreflect"
 )
 
 func (fd *File) lazyRawInit() {

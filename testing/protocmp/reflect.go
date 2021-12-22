@@ -10,10 +10,10 @@ import (
 	"strconv"
 	"strings"
 
-	"google.golang.org/protobuf/internal/genid"
-	"google.golang.org/protobuf/proto"
-	"google.golang.org/protobuf/reflect/protoreflect"
-	"google.golang.org/protobuf/runtime/protoiface"
+	"github.com/schattian/protobuf/internal/genid"
+	"github.com/schattian/protobuf/proto"
+	"github.com/schattian/protobuf/reflect/protoreflect"
+	"github.com/schattian/protobuf/runtime/protoiface"
 )
 
 func reflectValueOf(v interface{}) protoreflect.Value {

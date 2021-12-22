@@ -18,9 +18,13 @@ It has these top-level messages:
 */
 package proto3_20160519_a4ab9ec5
 
-import proto "google.golang.org/protobuf/internal/protolegacy"
-import fmt "fmt"
-import math "math"
+import (
+	fmt "fmt"
+
+	proto "github.com/schattian/protobuf/internal/protolegacy"
+
+	math "math"
+)
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ = proto.Marshal

@@ -5,13 +5,14 @@
 package protojson_test
 
 import (
-	"google.golang.org/protobuf/types/known/durationpb"
 	"math"
 	"testing"
 
-	pb3 "google.golang.org/protobuf/internal/testprotos/textpb3"
+	"github.com/schattian/protobuf/types/known/durationpb"
 
-	"google.golang.org/protobuf/encoding/protojson"
+	pb3 "github.com/schattian/protobuf/internal/testprotos/textpb3"
+
+	"github.com/schattian/protobuf/encoding/protojson"
 )
 
 func BenchmarkUnmarshal_Duration(b *testing.B) {

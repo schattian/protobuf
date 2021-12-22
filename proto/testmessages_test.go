@@ -5,18 +5,18 @@
 package proto_test
 
 import (
-	"google.golang.org/protobuf/encoding/protowire"
-	"google.golang.org/protobuf/internal/impl"
-	"google.golang.org/protobuf/internal/protobuild"
-	"google.golang.org/protobuf/proto"
-	"google.golang.org/protobuf/reflect/protoreflect"
-	"google.golang.org/protobuf/reflect/protoregistry"
-	"google.golang.org/protobuf/testing/protopack"
+	"github.com/schattian/protobuf/encoding/protowire"
+	"github.com/schattian/protobuf/internal/impl"
+	"github.com/schattian/protobuf/internal/protobuild"
+	"github.com/schattian/protobuf/proto"
+	"github.com/schattian/protobuf/reflect/protoreflect"
+	"github.com/schattian/protobuf/reflect/protoregistry"
+	"github.com/schattian/protobuf/testing/protopack"
 
-	legacypb "google.golang.org/protobuf/internal/testprotos/legacy"
-	requiredpb "google.golang.org/protobuf/internal/testprotos/required"
-	testpb "google.golang.org/protobuf/internal/testprotos/test"
-	test3pb "google.golang.org/protobuf/internal/testprotos/test3"
+	legacypb "github.com/schattian/protobuf/internal/testprotos/legacy"
+	requiredpb "github.com/schattian/protobuf/internal/testprotos/required"
+	testpb "github.com/schattian/protobuf/internal/testprotos/test"
+	test3pb "github.com/schattian/protobuf/internal/testprotos/test3"
 )
 
 type testProto struct {

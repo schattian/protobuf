@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+//go:build !purego && !appengine
 // +build !purego,!appengine
 
 package strs
@@ -9,7 +10,7 @@ package strs
 import (
 	"unsafe"
 
-	pref "google.golang.org/protobuf/reflect/protoreflect"
+	pref "github.com/schattian/protobuf/reflect/protoreflect"
 )
 
 type (

@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+//go:build !purego && !appengine
 // +build !purego,!appengine
 
 package protoreflect
@@ -9,7 +10,7 @@ package protoreflect
 import (
 	"unsafe"
 
-	"google.golang.org/protobuf/internal/pragma"
+	"github.com/schattian/protobuf/internal/pragma"
 )
 
 type (
