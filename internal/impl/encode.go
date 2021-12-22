@@ -180,20 +180,28 @@ func (mi *MessageInfo) appendExtensions(b []byte, ext *map[int32]ExtensionField,
 		}
 		return b, err
 	default:
-		// Sort the keys to provide a deterministic encoding.
-		// Not sure this is required, but the old code does it.
-		keys := make([]int, 0, len(*ext))
-		for k := range *ext {
-			keys = append(keys, int(k))
-		}
-		sort.Ints(keys)
-		var err error
-		for _, k := range keys {
-			x := (*ext)[int32(k)]
-			xi := getExtensionFieldInfo(x.Type())
-			b, err = xi.funcs.marshal(b, x.Value(), xi.wiretag, opts)
-			if err != nil {
-				return b, err
+		if opts.Deterministic() {
+			keys := make([]int, 0, len(*ext))
+			for k := range *ext {
+				keys = append(keys, int(k))
+			}
+			sort.Ints(keys)
+			for _, k := range keys {
+				x := (*ext)[int32(k)]
+				xi := getExtensionFieldInfo(x.Type())
+				b, err := xi.funcs.marshal(b, x.Value(), xi.wiretag, opts)
+				if err != nil {
+					return b, err
+				}
+			}
+		} else {
+			for k, _ := range *ext {
+				x := (*ext)[int32(k)]
+				xi := getExtensionFieldInfo(x.Type())
+				b, err := xi.funcs.marshal(b, x.Value(), xi.wiretag, opts)
+				if err != nil {
+					return b, err
+				}
 			}
 		}
 		return b, nil
