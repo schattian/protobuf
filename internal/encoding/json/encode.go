@@ -5,10 +5,13 @@
 package json
 
 import (
+	"bytes"
+	"encoding/base64"
 	"math"
 	"math/bits"
 	"strconv"
 	"strings"
+	"sync"
 	"unicode/utf8"
 
 	"google.golang.org/protobuf/internal/detrand"
@@ -17,6 +20,8 @@ import (
 
 // kind represents an encoding type.
 type kind uint8
+
+var encoderPool sync.Pool
 
 const (
 	_ kind = (1 << iota) / 2
@@ -34,42 +39,56 @@ type Encoder struct {
 	indent   string
 	lastKind kind
 	indents  []byte
-	out      []byte
+	out      bytes.Buffer
+	scratch  [64]byte
+
+	ptrLevel uint
+	ptrSeen  map[interface{}]struct{}
+}
+
+func (e *Encoder) Reset() {
+	e.out.Reset()
+	e.lastKind = 0
+}
+
+func (e *Encoder) SetIndent(indent string) error {
+	if len(indent) == 0 {
+		e.indent = ""
+		return nil
+	}
+	if strings.Trim(indent, " \t") != "" {
+		return errors.New("indent may only be composed of space or tab characters")
+	}
+	e.indent = indent
+	return nil
 }
 
 // NewEncoder returns an Encoder.
 //
 // If indent is a non-empty string, it causes every entry for an Array or Object
 // to be preceded by the indent and trailed by a newline.
-func NewEncoder(indent string) (*Encoder, error) {
-	e := &Encoder{}
-	if len(indent) > 0 {
-		if strings.Trim(indent, " \t") != "" {
-			return nil, errors.New("indent may only be composed of space or tab characters")
-		}
-		e.indent = indent
-	}
-	return e, nil
+func NewEncoder() *Encoder {
+	return &Encoder{}
 }
 
 // Bytes returns the content of the written bytes.
 func (e *Encoder) Bytes() []byte {
-	return e.out
+	return e.out.Bytes()
 }
 
 // WriteNull writes out the null value.
 func (e *Encoder) WriteNull() {
 	e.prepareNext(scalar)
-	e.out = append(e.out, "null"...)
+	e.out.WriteString("null")
 }
 
 // WriteBool writes out the given boolean value.
 func (e *Encoder) WriteBool(b bool) {
 	e.prepareNext(scalar)
 	if b {
-		e.out = append(e.out, "true"...)
+		e.out.WriteString("true")
 	} else {
-		e.out = append(e.out, "false"...)
+		e.out.WriteString("false")
 	}
 }
 
@@ -78,51 +97,81 @@ func (e *Encoder) WriteBool(b bool) {
 func (e *Encoder) WriteString(s string) error {
 	e.prepareNext(scalar)
 	var err error
-	if e.out, err = appendString(e.out, s); err != nil {
+	if err = e.appendString(s); err != nil {
 		return err
 	}
 	return nil
 }
 
+func (e *Encoder) WriteByteSlice(s []byte) {
+	e.prepareNext(scalar)
+
+	e.out.WriteByte('"')
+	encodedLen := base64.StdEncoding.EncodedLen(len(s))
+	if encodedLen <= len(e.scratch) {
+		// If the encoded bytes fit in e.scratch, avoid an extra
+		// allocation and use the cheaper Encoding.Encode.
+		dst := e.scratch[:encodedLen]
+		base64.StdEncoding.Encode(dst, s)
+		e.out.Write(dst)
+	} else if encodedLen <= 1024 {
+		// The encoded bytes are short enough to allocate for, and
+		// Encoding.Encode is still cheaper.
+		dst := make([]byte, encodedLen)
+		base64.StdEncoding.Encode(dst, s)
+		e.out.Write(dst)
+	} else {
+		// The encoded bytes are too long to cheaply allocate, and
+		// Encoding.Encode is no longer noticeably cheaper.
+		enc := base64.NewEncoder(base64.StdEncoding, &e.out)
+		enc.Write(s)
+		enc.Close()
+	}
+	e.out.WriteByte('"')
+}
+
 // Sentinel error used for indicating invalid UTF-8.
 var errInvalidUTF8 = errors.New("invalid UTF-8")
 
-func appendString(out []byte, in string) ([]byte, error) {
-	out = append(out, '"')
+func (e *Encoder) appendString(in string) error {
+	e.out.WriteByte('"')
 	i := indexNeedEscapeInString(in)
-	in, out = in[i:], append(out, in[:i]...)
+	e.out.WriteString(in[:i])
+	in = in[i:]
 	for len(in) > 0 {
 		switch r, n := utf8.DecodeRuneInString(in); {
 		case r == utf8.RuneError && n == 1:
-			return out, errInvalidUTF8
+			return errInvalidUTF8
 		case r < ' ' || r == '"' || r == '\\':
-			out = append(out, '\\')
+			e.out.WriteByte('\\')
 			switch r {
 			case '"', '\\':
-				out = append(out, byte(r))
+				e.out.WriteRune(r)
 			case '\b':
-				out = append(out, 'b')
+				e.out.WriteByte('b')
 			case '\f':
-				out = append(out, 'f')
+				e.out.WriteByte('f')
 			case '\n':
-				out = append(out, 'n')
+				e.out.WriteByte('n')
 			case '\r':
-				out = append(out, 'r')
+				e.out.WriteByte('r')
 			case '\t':
-				out = append(out, 't')
+				e.out.WriteByte('t')
 			default:
-				out = append(out, 'u')
-				out = append(out, "0000"[1+(bits.Len32(uint32(r))-1)/4:]...)
-				out = strconv.AppendUint(out, uint64(r), 16)
+				e.out.WriteByte('u')
+				e.out.WriteString("0000"[1+(bits.Len32(uint32(r))-1)/4:])
+				b := strconv.AppendUint(e.scratch[:0], uint64(r), 16)
+				e.out.Write(b)
 			}
 			in = in[n:]
 		default:
 			i := indexNeedEscapeInString(in[n:])
-			in, out = in[n+i:], append(out, in[:n+i]...)
+			e.out.WriteString(in[:n+i])
+			in = in[n+i:]
 		}
 	}
-	out = append(out, '"')
-	return out, nil
+	e.out.WriteByte('"')
+	return nil
 }
 
 // indexNeedEscapeInString returns the index of the character that needs
@@ -139,22 +188,25 @@ func indexNeedEscapeInString(s string) int {
 // WriteFloat writes out the given float and bitSize in JSON number value.
 func (e *Encoder) WriteFloat(n float64, bitSize int) {
 	e.prepareNext(scalar)
-	e.out = appendFloat(e.out, n, bitSize)
+	e.appendFloat(n, bitSize)
 }
 
-// appendFloat formats given float in bitSize, and appends to the given []byte.
-func appendFloat(out []byte, n float64, bitSize int) []byte {
+func (e *Encoder) appendFloat(n float64, bitSize int) {
 	switch {
 	case math.IsNaN(n):
-		return append(out, `"NaN"`...)
+		e.out.WriteString(`"NaN"`)
+		return
 	case math.IsInf(n, +1):
-		return append(out, `"Infinity"`...)
+		e.out.WriteString(`"Infinity"`)
+		return
 	case math.IsInf(n, -1):
-		return append(out, `"-Infinity"`...)
+		e.out.WriteString(`"-Infinity"`)
+		return
 	}
 
 	// JSON number formatting logic based on encoding/json.
 	// See floatEncoder.encode for reference.
+	b := e.scratch[:0]
 	fmt := byte('f')
 	if abs := math.Abs(n); abs != 0 {
 		if bitSize == 64 && (abs < 1e-6 || abs >= 1e21) ||
@@ -162,39 +214,62 @@ func appendFloat(out []byte, n float64, bitSize int) []byte {
 			fmt = 'e'
 		}
 	}
-	out = strconv.AppendFloat(out, n, fmt, -1, bitSize)
+	b = strconv.AppendFloat(b, n, fmt, -1, bitSize)
 	if fmt == 'e' {
-		n := len(out)
-		if n >= 4 && out[n-4] == 'e' && out[n-3] == '-' && out[n-2] == '0' {
-			out[n-2] = out[n-1]
-			out = out[:n-1]
+		n := len(b)
+		if n >= 4 && b[n-4] == 'e' && b[n-3] == '-' && b[n-2] == '0' {
+			b[n-2] = b[n-1]
+			b = b[:n-1]
 		}
 	}
-	return out
+
+	e.out.Write(b)
 }
 
 // WriteInt writes out the given signed integer in JSON number value.
 func (e *Encoder) WriteInt(n int64) {
 	e.prepareNext(scalar)
-	e.out = append(e.out, strconv.FormatInt(n, 10)...)
+	b := strconv.AppendInt(e.scratch[:0], n, 10)
+	e.out.Write(b)
 }
 
 // WriteUint writes out the given unsigned integer in JSON number value.
 func (e *Encoder) WriteUint(n uint64) {
 	e.prepareNext(scalar)
-	e.out = append(e.out, strconv.FormatUint(n, 10)...)
+	b := strconv.AppendUint(e.scratch[:0], n, 10)
+	e.out.Write(b)
+}
+
+// WriteInt64 writes the given int64 as string (as it's specified by the I-JSON spec)
+func (e *Encoder) WriteInt64(n int64) error {
+	e.prepareNext(scalar)
+	b := strconv.AppendInt(e.scratch[:0], n, 10)
+	e.out.WriteByte('"')
+	e.out.Write(b)
+	e.out.WriteByte('"')
+	return nil
+}
+
+// WriteUint64 writes the given uint64 as string (as it's specified by the I-JSON spec)
+func (e *Encoder) WriteUint64(n uint64) error {
+	e.prepareNext(scalar)
+	b := strconv.AppendUint(e.scratch[:0], n, 10)
+	e.out.WriteByte('"')
+	e.out.Write(b)
+	e.out.WriteByte('"')
+	return nil
 }
 
 // StartObject writes out the '{' symbol.
 func (e *Encoder) StartObject() {
 	e.prepareNext(objectOpen)
-	e.out = append(e.out, '{')
+	e.out.WriteByte('{')
 }
 
 // EndObject writes out the '}' symbol.
 func (e *Encoder) EndObject() {
 	e.prepareNext(objectClose)
-	e.out = append(e.out, '}')
+	e.out.WriteByte('}')
 }
 
 // WriteName writes out the given string in JSON string value and the name
@@ -204,21 +279,21 @@ func (e *Encoder) WriteName(s string) error {
 	e.prepareNext(name)
 	var err error
 	// Append to output regardless of error.
-	e.out, err = appendString(e.out, s)
-	e.out = append(e.out, ':')
+	err = e.appendString(s)
+	e.out.WriteByte(':')
 	return err
 }
 
 // StartArray writes out the '[' symbol.
 func (e *Encoder) StartArray() {
 	e.prepareNext(arrayOpen)
-	e.out = append(e.out, '[')
+	e.out.WriteByte('[')
 }
 
 // EndArray writes out the ']' symbol.
 func (e *Encoder) EndArray() {
 	e.prepareNext(arrayClose)
-	e.out = append(e.out, ']')
+	e.out.WriteByte(']')
 }
 
 // prepareNext adds possible comma and indentation for the next value based
@@ -233,11 +308,11 @@ func (e *Encoder) prepareNext(next kind) {
 		// Need to add comma on the following condition.
 		if e.lastKind&(scalar|objectClose|arrayClose) != 0 &&
 			next&(name|scalar|objectOpen|arrayOpen) != 0 {
-			e.out = append(e.out, ',')
+			e.out.WriteByte(',')
 			// For single-line output, add a random extra space after each
 			// comma to make output unstable.
 			if detrand.Bool() {
-				e.out = append(e.out, ' ')
+				e.out.WriteByte(' ')
 			}
 		}
 		return
@@ -248,29 +323,30 @@ func (e *Encoder) prepareNext(next kind) {
 		// If next type is NOT closing, add indent and newline.
 		if next&(objectClose|arrayClose) == 0 {
 			e.indents = append(e.indents, e.indent...)
-			e.out = append(e.out, '\n')
-			e.out = append(e.out, e.indents...)
+			e.out.WriteByte('\n')
+			e.out.Write(e.indents)
 		}
 
 	case e.lastKind&(scalar|objectClose|arrayClose) != 0:
 		switch {
 		// If next type is either a value or name, add comma and newline.
 		case next&(name|scalar|objectOpen|arrayOpen) != 0:
-			e.out = append(e.out, ',', '\n')
+			e.out.WriteByte(',')
+			e.out.WriteByte('\n')
 
 		// If next type is a closing object or array, adjust indentation.
 		case next&(objectClose|arrayClose) != 0:
 			e.indents = e.indents[:len(e.indents)-len(e.indent)]
-			e.out = append(e.out, '\n')
+			e.out.WriteByte('\n')
 		}
-		e.out = append(e.out, e.indents...)
+		e.out.Write(e.indents)
 
 	case e.lastKind&name != 0:
-		e.out = append(e.out, ' ')
+		e.out.WriteByte(' ')
 		// For multi-line output, add a random extra space after key: to make
 		// output unstable.
 		if detrand.Bool() {
-			e.out = append(e.out, ' ')
+			e.out.WriteByte(' ')
 		}
 	}
 }
